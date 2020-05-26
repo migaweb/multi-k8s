@@ -1,0 +1,36 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  local:
+    push: false
+  artifacts:
+    - image: killerbugs/multi-client
+      context: client
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        '**/*.js': .
+        '**/*.css': .
+        '**/*.html': .
+    - image: killerbugs/multi-server
+      context: server
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        '**/*.js': .
+    - image: killerbugs/multi-worker
+      context: worker
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        '**/*.js': .
+deploy:
+  kubectl:
+    manifests:
+      - k8s/client-deployment.yaml
+      - k8s/server-deployment.yaml
+      - k8s/worker-deployment.yaml
+      - k8s/postgres-deployment.yaml
+      - k8s/redis-deployment.yaml
+      - k8s/ingress-service.yaml
+      - k8s/database-persistent-volume-claim.yaml
